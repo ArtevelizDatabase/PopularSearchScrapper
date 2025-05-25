@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Envato Elements Text Scraper</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="header">
+    <div class="container">
+      <h1><i class="bi bi-search"></i> Envato Elements Text Scraper</h1>
+      <p class="lead">Extract texts from specific popular search categories</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Target Categories Info -->
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-list-check"></i> Target Categories
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info border-0" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);">
+          <i class="bi bi-info-circle text-primary"></i>
+          <strong>Scraping Target:</strong> This scraper will extract texts from the following 5 specific categories:
+          <ol class="mb-0 mt-2">
+            <li><strong>Graphic Templates</strong> - <code>popular-searches/graphic-templates</code></li>
+            <li><strong>Presentation Templates</strong> - <code>popular-searches/presentation-templates</code></li>
+            <li><strong>Graphics</strong> - <code>popular-searches/graphics</code></li>
+            <li><strong>Web Templates</strong> - <code>popular-searches/web-templates</code></li>
+            <li><strong>Add Ons</strong> - <code>popular-searches/add-ons</code></li>
+          </ol>
+          <div class="mt-2">
+            <strong>Selector Structure:</strong> <code>.RnzMlSB3 > .MSA0SguZ > span.yb8FMcW3</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-gear"></i> Scraping Control
+      </div>
+      <div class="card-body">
+        <!-- Start Scraping -->
+        <div class="mb-4">
+          <button class="btn btn-primary btn-lg" onclick="startScraping()" id="scrapeButton">
+            <i class="bi bi-play-circle-fill"></i> Start Scraping (5 Categories)
+          </button>
+          
+          <div id="loading" class="loading mt-3">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <span class="ms-3">
+              <strong>Processing...</strong> <span id="progressText">Scraping specific categories...</span>
+            </span>
+          </div>
+        </div>
+        
+        <div id="errorMessage" class="error-message mt-3">
+          <i class="bi bi-exclamation-triangle"></i>
+          <span id="errorText"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="card" id="summaryCard" style="display: none;">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-bar-chart"></i> Scraping Summary</span>
+        <div>
+          <button class="btn btn-sm btn-success" onclick="exportCSV()">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+          </button>
+          <button class="btn btn-sm btn-info ms-2" onclick="exportJSON()">
+            <i class="bi bi-file-earmark-code"></i> Export JSON
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="summary-stat">
+              <div class="summary-stat-number" id="totalSubpages">0</div>
+              <div class="summary-stat-label"><i class="bi bi-folder"></i> Categories</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="summary-stat">
+              <div class="summary-stat-number" id="successfulPages">0</div>
+              <div class="summary-stat-label"><i class="bi bi-check-circle"></i> Successful</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="summary-stat">
+              <div class="summary-stat-number" id="totalTexts">0</div>
+              <div class="summary-stat-label"><i class="bi bi-tags"></i> Total Texts</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="summary-stat">
+              <div class="summary-stat-number" id="averageTexts">0</div>
+              <div class="summary-stat-label"><i class="bi bi-graph-up"></i> Avg per Category</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Table -->
+    <div class="card" id="resultsCard" style="display: none;">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-table"></i> Scraped Categories</span>
+          <div class="d-flex align-items-center">
+            <i class="bi bi-search me-2"></i>
+            <input type="text" class="form-control form-control-sm" 
+                   style="width: 250px;" id="searchInput" 
+                   placeholder="Search categories..." onkeyup="filterResults()">
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th><i class="bi bi-folder"></i> Category</th>
+                <th class="text-center"><i class="bi bi-hash"></i> Texts Count</th>
+                <th class="text-center"><i class="bi bi-check-circle"></i> Status</th>
+                <th class="text-center"><i class="bi bi-eye"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody id="resultsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed View Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">
+              <i class="bi bi-list-ul"></i> Category Details
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" title="Close modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="modalContent"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="bi bi-x-lg"></i> Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
